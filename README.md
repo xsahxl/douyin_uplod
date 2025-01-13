@@ -1,3 +1,5 @@
+# 添加test.py仅测试跑通主流程
+
 # 发布视频小程序V3.2
 ## 介绍
 - [old_douyin_uplod](https://github.com/Superheroff/douyin_uplod/tree/main)
