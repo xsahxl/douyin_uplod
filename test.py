@@ -67,8 +67,14 @@ class upload_douyin:
             # 点击发布按钮
             try:
                 await page.wait_for_url("https://creator.douyin.com/creator-micro/content/publish?enter_from=publish_page")
-                await page.get_by_role("button", name="发布", exact=True).click()
-                logging.info("已点击发布按钮")
+                success_message = await page.wait_for_selector(
+                    "text=上传成功",  # 根据实际提示文本调整
+                    timeout=self.timeout*2  # 增加超时时间
+                )
+                if success_message:
+                    logging.info("视频上传成功")
+                    await page.get_by_role("button", name="发布", exact=True).click()
+                    logging.info("已点击发布按钮")
             except Exception as e:
                 logging.error("点击发布按钮失败\n")
                 logging.error(e)
