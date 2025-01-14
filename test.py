@@ -68,7 +68,7 @@ class upload_douyin:
             try:
                 success_message = await page.wait_for_selector(
                     "text=上传成功",
-                    timeout=self.timeout*3
+                    timeout=self.timeout*10
                 )
                 if success_message:
                     logging.info("视频上传成功")
@@ -84,7 +84,7 @@ class upload_douyin:
                 # 等待成功提示出现
                 success_message = await page.wait_for_selector(
                     "text=发布成功",
-                    timeout=self.timeout*3
+                    timeout=self.timeout*10
                 )
                 if success_message:
                     logging.info("视频发布成功")
