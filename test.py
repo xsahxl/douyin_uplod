@@ -66,10 +66,9 @@ class upload_douyin:
 
             # 点击发布按钮
             try:
-                await page.wait_for_url("https://creator.douyin.com/creator-micro/content/publish?enter_from=publish_page")
                 success_message = await page.wait_for_selector(
-                    "text=上传成功",  # 根据实际提示文本调整
-                    timeout=self.timeout*2  # 增加超时时间
+                    "text=上传成功",
+                    timeout=self.timeout*3
                 )
                 if success_message:
                     logging.info("视频上传成功")
@@ -84,8 +83,8 @@ class upload_douyin:
             try:
                 # 等待成功提示出现
                 success_message = await page.wait_for_selector(
-                    "text=发布成功",  # 根据实际提示文本调整
-                    timeout=self.timeout*2  # 增加超时时间
+                    "text=发布成功",
+                    timeout=self.timeout*3
                 )
                 if success_message:
                     logging.info("视频发布成功")
@@ -114,7 +113,7 @@ def run():
     video_path = "./video/test.mp4"
 
     # 初始化并运行上传任务
-    app = upload_douyin(timeout=180, cookie_file=cookie_file)
+    app = upload_douyin(timeout=60, cookie_file=cookie_file)
     asyncio.run(app.main(video_path))
 
 
