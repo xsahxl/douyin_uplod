@@ -40,7 +40,6 @@ class creator_douyin():
         try:
             await page.wait_for_url("https://creator.xiaohongshu.com/new/home", timeout=self.timeout)
             cookies = await context.cookies()
-            print(cookies)
             cookie_txt = ''
             for i in cookies:
                 cookie_txt += i.get('name') + '=' + i.get('value') + '; '
