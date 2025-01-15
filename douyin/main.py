@@ -42,7 +42,7 @@ class upload_douyin:
         browser = await self.playwright_init(p)
         context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"],  permissions=[])
         page = await context.new_page()
-        await page.add_init_script(path="stealth.min.js")
+        await page.add_init_script(path="../stealth.min.js")
         await page.goto("https://creator.douyin.com/creator-micro/content/upload", timeout=self.timeout)
 
         logging.info("正在判断账号是否登录")
@@ -51,51 +51,45 @@ class upload_douyin:
             return
         logging.info("账号已登录")
 
+        # 上传视频
         try:
-            # 上传视频
-            try:
-                async with page.expect_file_chooser() as fc_info:
-                    await page.locator("div.container-drag-title-p6mssi:has-text('点击上传 或直接将视频文件拖入此区域')").click()
-                file_chooser = await fc_info.value
-                await file_chooser.set_files(video_path, timeout=self.timeout)
-                logging.info("视频已选择")
-            except Exception as e:
-                logging.error("上传视频失败，可能网页加载失败了\n")
-                logging.error(e)
-                return
-
-            # 点击发布按钮
-            try:
-                success_message = await page.wait_for_selector(
-                    "text=上传成功",
-                    timeout=self.timeout*10
-                )
-                if success_message:
-                    logging.info("视频上传成功")
-                    await page.get_by_role("button", name="发布", exact=True).click()
-                    logging.info("已点击发布按钮")
-            except Exception as e:
-                logging.error("点击发布按钮失败\n")
-                logging.error(e)
-                return
-
-            # 检查发布成功提示
-            try:
-                # 等待成功提示出现
-                success_message = await page.wait_for_selector(
-                    "text=发布成功",
-                    timeout=self.timeout*10
-                )
-                if success_message:
-                    logging.info("视频发布成功")
-            except Exception as e:
-                logging.error("未检测到发布成功提示\n")
-                logging.error(e)
+            async with page.expect_file_chooser() as fc_info:
+                await page.locator("div.container-drag-title-p6mssi:has-text('点击上传 或直接将视频文件拖入此区域')").click()
+            file_chooser = await fc_info.value
+            await file_chooser.set_files(video_path, timeout=self.timeout)
+            logging.info("视频已选择")
         except Exception as e:
-            logging.error("发布视频失败，可能 cookie 已失效或网络问题\n")
+            logging.error("上传视频失败，可能网页加载失败了\n")
             logging.error(e)
-        finally:
-            await browser.close()
+            return
+
+        # 点击发布按钮
+        try:
+            await page.wait_for_selector(
+                "text=上传成功",
+                timeout=self.timeout*10
+            )
+            logging.info("视频上传成功")
+            await page.get_by_role("button", name="发布", exact=True).click()
+            logging.info("已点击发布按钮")
+        except Exception as e:
+            logging.error("点击发布按钮失败\n")
+            logging.error(e)
+            return
+
+        # 检查发布成功提示
+        try:
+            # 等待成功提示出现
+            await page.wait_for_selector(
+                "text=发布成功",
+                timeout=self.timeout*10
+            )
+            logging.info("视频发布成功")
+        except Exception as e:
+            logging.error("未检测到发布成功提示\n")
+            logging.error(e)
+
+        await browser.close()
 
     async def main(self, video_path: str):
         """
@@ -110,7 +104,7 @@ def run():
     # 替换为你的 cookie 文件路径
     cookie_file = "./cookie/cookie_17311329731.json"
     # 替换为你的视频文件路径
-    video_path = "./video/test.mp4"
+    video_path = "../video/test.mp4"
 
     # 初始化并运行上传任务
     app = upload_douyin(timeout=60, cookie_file=cookie_file)

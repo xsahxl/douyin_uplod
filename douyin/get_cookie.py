@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-@Time    : 2024/1/10 22:11
-@Author  : superhero
-@Email   : 838210720@qq.com
-@File    : get_cookie.py
-@IDE: PyCharm
-"""
-
 import asyncio
 import os
 from playwright.async_api import Playwright, async_playwright
