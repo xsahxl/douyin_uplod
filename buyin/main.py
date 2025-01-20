@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import math
+import random
 from playwright.async_api import Playwright, async_playwright, TimeoutError as PlaywrightTimeoutError
 
 # 配置日志
@@ -32,12 +32,11 @@ class buyin:
         """
         browser = await p.chromium.launch(headless=headless, ignore_default_args=["--enable-automation"], channel="chrome")
         return browser
-    async def scroll_to_find_element(self, page, target_selector, max_scroll_attempts):
+    async def scroll_to_find_element(self, page, target_selector):
         """
         滚动查找目标元素
         :param page: Playwright 页面对象
         :param target_selector: 目标元素的选择器
-        :param max_scroll_attempts: 最大滚动尝试次数
         """
         # 获取 ID 为 live-control-goods-list-container 的元素
         container = page.locator('#live-control-goods-list-container')
@@ -47,11 +46,11 @@ class buyin:
 
         # 获取 scroll_element 的高度
         scroll_height = await scroll_element.evaluate("element => element.clientHeight")
-        scroll_distance = scroll_height  # 初始滚动距离
+        scroll_distance = random.randint(max(scroll_height - 300, 0), scroll_height)  # 初始滚动距离
 
         logging.info(f"正在查找目标元素: {target_selector} ...")
 
-        for _ in range(max_scroll_attempts):
+        for _ in range(30):
             try:
                 # 检查目标元素是否已经存在
                 await page.wait_for_selector(target_selector, state="attached", timeout=5000)
@@ -62,7 +61,7 @@ class buyin:
                 # 模拟滚动：对子元素进行滚动
                 await scroll_element.evaluate(f"element => element.scrollBy(0, {scroll_distance})")
                 await page.wait_for_timeout(1000)  # 等待加载
-                scroll_distance += scroll_height  # 每次滚动后增加滚动距离
+                scroll_distance += random.randint(max(scroll_height - 300, 0), scroll_height)  # 每次滚动后增加滚动距离
         return False
 
     async def click_explain_button(self, page, goods_number: int):
@@ -75,8 +74,7 @@ class buyin:
 
         # 如果 goods_number 大于 9，则执行滚动逻辑
         if goods_number > self.page_size:
-            max_scroll_attempts = math.ceil(goods_number / self.page_size)
-            found = await self.scroll_to_find_element(page, target_selector, max_scroll_attempts)
+            found = await self.scroll_to_find_element(page, target_selector)
             if not found:
                 logging.error(f"未找到 {goods_number} 号链接")
                 return
@@ -144,5 +142,5 @@ def run(goods_number: int, page_size = 9):
 
 if __name__ == '__main__':
     # 传入商品编号
-    goods_number = 5
+    goods_number = 20
     run(goods_number)
