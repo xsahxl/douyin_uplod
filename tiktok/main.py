@@ -42,10 +42,10 @@ class upload_xiaohongshu:
         context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"], permissions=[])
         page = await context.new_page()
         await page.add_init_script(path="../stealth.min.js")
-        await page.goto("https://creator.xiaohongshu.com/publish/publish", timeout=self.timeout)
+        await page.goto("https://www.tiktok.com/tiktokstudio/upload", timeout=self.timeout)
 
         logging.info("正在判断账号是否登录")
-        if "/publish/publish" not in page.url:
+        if "/tiktokstudio/upload" not in page.url:
             logging.info("账号未登录")
             return
         logging.info("账号已登录")
@@ -53,7 +53,7 @@ class upload_xiaohongshu:
         # 上传视频
         try:
             async with page.expect_file_chooser() as fc_info:
-                await page.locator("div.drag-over:has-text('上传视频')").click()
+                await page.locator("div.upload-card:has-text('选择要上传的视频')").click()
             file_chooser = await fc_info.value
             await file_chooser.set_files(video_path, timeout=self.timeout)
             logging.info("视频已选择")
@@ -61,17 +61,11 @@ class upload_xiaohongshu:
             logging.error("上传视频失败，可能网页加载失败了\n")
             logging.error(e)
             return
-
         # 点击发布按钮
         try:
-            await page.wait_for_selector(
-                "text=上传成功",
-                timeout=self.timeout*10
-            )
-            logging.info("视频上传成功")
             # 等待发布按钮变为可点击状态
             await page.wait_for_selector(
-                "button:has-text('发布'):not([disabled])",
+                "button[type='button']:has-text('发布'):not([disabled])",
                 timeout=self.timeout*5
             )
             logging.info("发布按钮已变为可点击状态")
@@ -86,11 +80,11 @@ class upload_xiaohongshu:
         try:
             # 等待成功提示出现
             success_message = await page.wait_for_selector(
-                "text=发布成功",
+                "text=视频已发布",
                 timeout=self.timeout*10
             )
             if success_message:
-                logging.info("视频发布成功")
+                logging.info("视频已发布")
         except Exception as e:
             logging.error("未检测到发布成功提示\n")
             logging.error(e)
@@ -107,7 +101,7 @@ class upload_xiaohongshu:
 
 def run():
     # 替换为你的 cookie 文件路径
-    cookie_file = "./cookie/cookie_17311329731.json"
+    cookie_file = "./cookie/cookie.json"
     # 替换为你的视频文件路径
     video_path = "../video/test.mp4"
 

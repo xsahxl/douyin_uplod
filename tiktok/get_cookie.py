@@ -28,7 +28,7 @@ class creator_douyin():
         await page.goto("https://www.tiktok.com/login")
 
         try:
-            await page.wait_for_url("https://www.tiktok.com/foryou", timeout=self.timeout)
+            await page.wait_for_url(lambda url: "https://www.tiktok.com/foryou" in url, timeout=self.timeout)
             cookies = await context.cookies()
             print(" ——> 获取cookie", cookies)
             cookie_txt = ''
